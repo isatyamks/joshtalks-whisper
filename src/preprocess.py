@@ -23,9 +23,6 @@ os.makedirs(PROCESSED_AUDIO_DIR, exist_ok=True)
 os.makedirs(PROCESSED_TRANSCRIPT_DIR, exist_ok=True)
 
 def normalize_text(text):
-    """
-    Normalize Hindi text for ASR training.
-    """
     text = unicodedata.normalize("NFKC", text).strip()
     text = text.replace("'", "'").replace("'", "'").replace(""", '"').replace(""", '"')
     text = re.sub(r"\s+", " ", text)
@@ -96,8 +93,14 @@ def main():
             writer.writeheader()
             writer.writerows(processed_records)
 
-        print(f"Processed {len(processed_records)} files")
-        print(f"Output: {OUTPUT_CSV}")
+        total_duration = sum(float(r['processed_duration']) for r in processed_records)
+        print(f"\n{'='*60}")
+        print("PREPROCESSING COMPLETE")
+        print(f"{'='*60}")
+        print(f"Files processed: {len(processed_records)}")
+        print(f"Total audio duration: {total_duration/3600:.2f} hours ({total_duration/60:.2f} minutes)")
+        print(f"Output CSV: {OUTPUT_CSV}")
+        print(f"{'='*60}")
 
 if __name__ == "__main__":
     main()

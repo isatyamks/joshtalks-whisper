@@ -1,8 +1,3 @@
-"""
-Fine-tuning script for Whisper-small model on Hindi ASR dataset.
-Uses Hugging Face Transformers and Datasets libraries.
-"""
-
 import os
 import csv
 import torch
@@ -32,10 +27,6 @@ MAX_LABEL_LENGTH = 448
 
 @dataclass
 class DataCollatorSpeechSeq2SeqWithPadding:
-    """
-    Data collator for Whisper fine-tuning.
-    Pads audio inputs and labels to the same length.
-    """
     processor: Any
 
     def __call__(self, features: List[Dict[str, Union[List[int], torch.Tensor]]]) -> Dict[str, torch.Tensor]:

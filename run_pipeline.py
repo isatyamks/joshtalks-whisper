@@ -1,7 +1,3 @@
-"""
-Main pipeline script to run the complete workflow.
-"""
-
 import os
 import sys
 import subprocess

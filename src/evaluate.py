@@ -1,8 +1,3 @@
-"""
-Evaluation script for Whisper models on FLEURS Hindi test dataset.
-Evaluates both baseline Whisper-small and fine-tuned model.
-"""
-
 import os
 import sys
 import json
@@ -39,9 +34,6 @@ def transcribe_batch(model, processor, audio_arrays, device, batch_size=8):
     return transcriptions
 
 def evaluate_model(model_path, model_name, dataset, device):
-    """
-    Evaluate a Whisper model on the FLEURS Hindi test set.
-    """
     processor = WhisperProcessor.from_pretrained(model_path, language="hi", task="transcribe")
     model = WhisperForConditionalGeneration.from_pretrained(model_path)
     model = model.to(device)
@@ -130,10 +122,27 @@ def main():
         })
 
     df = pd.DataFrame(summary_data)
+    
+    print("\n" + "="*80)
+    print("EVALUATION RESULTS - FLEURS Hindi Test Set")
+    print("="*80)
     print("\n" + df.to_string(index=False))
-
+    print("\n" + "="*80)
+    
+    print("\nMarkdown Table Format:")
+    print("-"*80)
+    try:
+        print(df.to_markdown(index=False))
+    except AttributeError:
+        markdown_table = "| " + " | ".join(df.columns) + " |\n"
+        markdown_table += "| " + " | ".join(["---"] * len(df.columns)) + " |\n"
+        for _, row in df.iterrows():
+            markdown_table += "| " + " | ".join(str(val) for val in row) + " |\n"
+        print(markdown_table)
+    print("-"*80)
+    
     df.to_csv(RESULTS_CSV, index=False)
-    print(f"Results saved to: {RESULTS_CSV}")
+    print(f"\nResults saved to: {RESULTS_CSV}")
     print(f"Detailed results saved to: {RESULTS_JSON}")
 
 if __name__ == "__main__":

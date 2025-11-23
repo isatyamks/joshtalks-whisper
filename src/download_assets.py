@@ -28,7 +28,6 @@ def main():
     with open(CSV_PATH, newline='', encoding='utf-8') as csvfile:
         reader = csv.DictReader(csvfile)
         for row in reader:
-
             audio_url = row['rec_url_gcp']
             audio_id = get_id_from_url(audio_url)
             audio_ext = os.path.splitext(audio_url)[1]
