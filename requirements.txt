@@ -20,7 +20,3 @@ tqdm>=4.65.0
 # Utilities
 requests>=2.31.0
 
-# PDF generation
-markdown>=3.4.0
-weasyprint>=60.0
-

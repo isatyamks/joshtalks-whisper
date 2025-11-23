@@ -1,5 +1,4 @@
 import os
-import sys
 import json
 import torch
 from transformers import WhisperProcessor, WhisperForConditionalGeneration

@@ -6,32 +6,40 @@ This project fine-tunes OpenAI's Whisper-small model on a Hindi ASR dataset and 
 
 ```
 joshtalks-whisper/
-├── data/
+├── data/                   # Data directories (gitignored - add your data here)
 │   ├── audio/              # Raw audio files
 │   ├── transcript/         # Raw transcript JSON files
 │   ├── metadata/           # Metadata JSON files
 │   ├── processed_audio/    # Preprocessed audio files (16kHz, mono, trimmed)
 │   ├── processed_transcript/ # Preprocessed transcript text files
-│   ├── ft_data.csv         # Original dataset CSV
-│   └── preprocessed_data.csv # Preprocessed dataset CSV
-├── models/
+│   └── ft_data.csv         # Original dataset CSV
+├── models/                 # Model directory (gitignored - models saved here)
 │   └── whisper-small-hindi/ # Fine-tuned model (created after training)
-├── results/                # Evaluation results (created after evaluation)
-├── notebooks/
-│   └── Preprocessing.ipynb # Exploratory preprocessing notebook
-├── src/
+├── results/                # Results directory (gitignored - evaluation results saved here)
+├── docs/                   # Documentation
+│   ├── CODE_DOCUMENTATION.md
+│   ├── PREPROCESSING_TECHNICAL.md
+│   ├── PREPROCESSING_ANALYSIS.md
+│   ├── PREPROCESSING_EXECUTIVE_SUMMARY.md
+│   └── README.md
+├── notebooks/              # Jupyter notebooks
+│   └── Preprocessing.ipynb
+├── src/                    # Source code
 │   ├── download_assets.py  # Download audio, transcripts, and metadata
 │   ├── preprocess.py       # Preprocessing pipeline
 │   ├── finetune_whisper.py # Fine-tuning script
 │   └── evaluate.py         # Evaluation script
+├── .gitignore
 ├── requirements.txt
 └── README.md
 ```
 
 ## Documentation
 
-📚 **Comprehensive Documentation Available:**
-- **[Preprocessing Analysis](docs/PREPROCESSING_ANALYSIS.md)** - Detailed technical documentation with rationale, trade-offs, statistics, and best practices (Senior ML Engineer perspective)
+Comprehensive Documentation Available:
+- **[Preprocessing Technical Documentation](docs/PREPROCESSING_TECHNICAL.md)** - Detailed technical analysis of preprocessing pipeline with ML engineering perspective
+- **[Code Documentation](docs/CODE_DOCUMENTATION.md)** - Complete documentation for all source code modules
+- **[Preprocessing Analysis](docs/PREPROCESSING_ANALYSIS.md)** - Detailed technical documentation with rationale, trade-offs, and best practices
 - **[Executive Summary](docs/PREPROCESSING_EXECUTIVE_SUMMARY.md)** - High-level overview for quick reference
 - **[Preprocessing Summary](PREPROCESSING_SUMMARY.md)** - Quick reference guide
 
@@ -124,18 +132,20 @@ python src/evaluate.py
 - Evaluates baseline Whisper-small model
 - Evaluates fine-tuned model (if available)
 - Computes WER (Word Error Rate) and CER (Character Error Rate)
-- Saves results to `results/evaluation_results.csv` and `results/evaluation_results.json`
+- Saves results to `results/FT Result.csv` and `results/FT Result.json`
 
 **Output:**
 - Structured table with WER and CER for both models
 - Improvement metrics showing fine-tuning gains
 - Detailed JSON file with predictions and references
 
+**Note:** Data files, model files, and results are excluded from the repository. Add your own data files to the `data/` directory after cloning.
+
 ## Results
 
 After evaluation, results are saved in:
-- `results/evaluation_results.csv` - Summary table
-- `results/evaluation_results.json` - Detailed results with predictions
+- `results/FT Result.csv` - Summary table
+- `results/FT Result.json` - Detailed results with predictions
 
 The summary table includes:
 - Model name

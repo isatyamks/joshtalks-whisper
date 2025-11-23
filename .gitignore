@@ -1,21 +1,24 @@
-# Data directories
-/data/audio/
-/data/transcript/
-/data/metadata/
-/data/processed_audio/
-/data/processed_transcript/
-/data/test/
-/data/*.csv
+# Data directories (excluding .gitkeep)
+data/audio/
+data/transcript/
+data/metadata/
+data/processed_audio/
+data/processed_transcript/
+data/test/
+data/*.csv
+!data/.gitkeep
 
-# Model files
-/models/
+# Model files (excluding .gitkeep)
+models/
 *.safetensors
 *.bin
 *.pt
 *.pth
+!models/.gitkeep
 
-# Results
-/results/
+# Results (excluding .gitkeep)
+results/
+!results/.gitkeep
 
 # Python cache
 __pycache__/
@@ -40,7 +43,6 @@ ENV/
 
 # Jupyter Notebook checkpoints
 .ipynb_checkpoints/
-*.ipynb
 
 # Logs
 *.log
