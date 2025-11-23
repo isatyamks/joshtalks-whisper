@@ -93,73 +93,98 @@ def load_fleurs_hindi_test():
             print(f"✅ Loaded {len(dataset)} Hindi samples via streaming")
             
         except Exception as stream_error:
-            # Both methods failed - provide clear instructions
-            print(f"\n❌ Streaming also failed: {stream_error}")
-            print("\n" + "="*60)
-            print("⚠️  UNABLE TO LOAD EFFICIENTLY")
-            print("="*60)
-            print("\nThe current datasets library version doesn't efficiently support")
-            print("loading only Hindi data without downloading all languages first.")
-            print("\n💡 SOLUTION: Downgrade to datasets library that supports language configs:")
-            print("\n   1. Stop any current downloads (Ctrl+C if needed)")
-            print("   2. Install: pip install 'datasets==3.6.0'")
-            print("   3. Run this script again")
-            print("\nThis will allow using: load_dataset('google/fleurs', 'hi_in', split='test')")
-            print("which downloads ONLY Hindi data (~2-3 GB), not all 102 languages.\n")
+            # Standard streaming failed - try Parquet format with streaming
+            print(f"   Standard streaming failed: {stream_error}")
+            print("\n📦 Trying Parquet format with streaming...")
             
-            raise RuntimeError(
-                f"Could not load Hindi dataset efficiently.\n\n"
-                f"Direct config error: {direct_error}\n"
-                f"Streaming error: {stream_error}\n\n"
-                f"SOLUTION: pip install 'datasets==3.6.0'"
-            ) from stream_error
-        
-    except Exception as e:
-        print(f"\n❌ Streaming approach failed: {e}")
-        print("\n🔄 Trying alternative approach...")
-        print("   Note: The Parquet format downloads ALL languages first.")
-        print("   If this fails, you may need to downgrade datasets library:")
-        print("   pip install 'datasets==3.6.0'")
-        
-        # Try without Parquet revision - might work with older format
-        try:
-            print("\n   Attempting with standard format (not Parquet)...")
-            dataset_stream = load_dataset(
-                "google/fleurs", 
-                "default", 
-                split="test",
-                streaming=True
-            )
-            
-            def is_hindi_sample(example):
-                sample_id = str(example.get('id', ''))
-                return 'hi_in' in sample_id
-            
-            hindi_stream = dataset_stream.filter(is_hindi_sample)
-            
-            from datasets import Dataset
-            hindi_samples = []
-            for sample in tqdm(hindi_stream, desc="Downloading Hindi samples"):
-                hindi_samples.append(sample)
-                if len(hindi_samples) >= 5000:
-                    break
-            
-            if len(hindi_samples) == 0:
-                raise ValueError("No Hindi samples found")
-            
-            dataset = Dataset.from_list(hindi_samples)
-            print(f"✓ Successfully loaded {len(dataset)} Hindi samples")
-            
-        except Exception as e2:
-            print(f"\n❌ Alternative approach also failed: {e2}")
-            raise RuntimeError(
-                f"Unable to load FLEURS Hindi dataset efficiently.\n\n"
-                f"Error 1 (streaming + Parquet): {e}\n"
-                f"Error 2 (streaming + standard): {e2}\n\n"
-                f"SOLUTION: Downgrade datasets library to version that supports language-specific configs:\n"
-                f"  pip install 'datasets==3.6.0'\n\n"
-                f"This will allow loading with: load_dataset('google/fleurs', 'hi_in', split='test')"
-            ) from e2
+            try:
+                # Try Parquet format with streaming
+                dataset_stream = load_dataset(
+                    "google/fleurs", 
+                    "default", 
+                    split="test",
+                    revision="convert/parquet",
+                    streaming=True
+                )
+                
+                print("✓ Connected to Parquet stream")
+                print("   Filtering for Hindi samples...")
+                
+                def is_hindi_sample(example):
+                    sample_id = str(example.get('id', ''))
+                    return 'hi_in' in sample_id
+                
+                hindi_stream = dataset_stream.filter(is_hindi_sample)
+                
+                # Convert streaming dataset to regular dataset
+                # Note: Audio decoding will happen during iteration, which requires torchcodec
+                from datasets import Dataset
+                print("   Converting stream to dataset (downloading Hindi Parquet files)...")
+                print("   ⚠️  Note: Audio decoding requires 'torchcodec' package")
+                
+                # Collect samples from stream
+                # Audio will be decoded during iteration, so torchcodec is needed
+                hindi_samples = []
+                for sample in tqdm(hindi_stream, desc="Downloading Hindi samples"):
+                    hindi_samples.append(sample)
+                    if len(hindi_samples) >= 5000:
+                        break
+                
+                if len(hindi_samples) == 0:
+                    raise ValueError("No Hindi samples found")
+                
+                dataset = Dataset.from_list(hindi_samples)
+                print(f"✅ Loaded {len(dataset)} Hindi samples via Parquet streaming")
+                print("   (Audio files will be decoded when accessed during evaluation)")
+                
+            except ImportError as parquet_error:
+                # Check if it's the torchcodec error
+                if 'torchcodec' in str(parquet_error):
+                    print(f"\n❌ Parquet streaming requires 'torchcodec' for audio decoding.")
+                    print("\n" + "="*60)
+                    print("💡 SOLUTION OPTIONS:")
+                    print("="*60)
+                    print("\nOption 1 (RECOMMENDED - Simplest):")
+                    print("   pip install 'datasets==3.6.0'")
+                    print("   This enables direct config: load_dataset('google/fleurs', 'hi_in', split='test')")
+                    print("   Downloads ONLY Hindi data (~2-3 GB)")
+                    print("\nOption 2 (If you want to keep current datasets version):")
+                    print("   pip install torchcodec")
+                    print("   Then run this script again")
+                    print("\nWe recommend Option 1 as it's simpler and more efficient.\n")
+                    
+                    raise RuntimeError(
+                        f"Parquet streaming requires 'torchcodec' for audio decoding.\n\n"
+                        f"RECOMMENDED: pip install 'datasets==3.6.0'\n"
+                        f"OR: pip install torchcodec\n\n"
+                        f"Direct config error: {direct_error}\n"
+                        f"Standard streaming error: {stream_error}\n"
+                        f"Parquet streaming error: {parquet_error}"
+                    ) from parquet_error
+                else:
+                    raise
+            except Exception as parquet_error:
+                # All methods failed - MUST downgrade
+                print(f"\n❌ Parquet streaming also failed: {parquet_error}")
+                print("\n" + "="*60)
+                print("⚠️  REQUIRED ACTION: Downgrade datasets library")
+                print("="*60)
+                print("\nYour datasets library version doesn't support FLEURS dataset scripts.")
+                print("You MUST downgrade to use language-specific configs.\n")
+                print("📋 Steps:")
+                print("   1. Run: pip install 'datasets==3.6.0'")
+                print("   2. Run this script again: python src/evaluate.py")
+                print("\nThis will enable: load_dataset('google/fleurs', 'hi_in', split='test')")
+                print("which downloads ONLY Hindi data (~2-3 GB).\n")
+                
+                raise RuntimeError(
+                    f"All loading methods failed. Your datasets library version doesn't support\n"
+                    f"FLEURS dataset scripts. You MUST downgrade:\n\n"
+                    f"  pip install 'datasets==3.6.0'\n\n"
+                    f"Direct config error: {direct_error}\n"
+                    f"Standard streaming error: {stream_error}\n"
+                    f"Parquet streaming error: {parquet_error}"
+                ) from parquet_error
     
     # Cast audio column - this doesn't download yet, just sets up the format
     # Audio will be downloaded when accessed during evaluation
