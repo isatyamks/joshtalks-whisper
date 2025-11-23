@@ -12,8 +12,8 @@ import evaluate as evaluate_lib
 BASELINE_MODEL = "openai/whisper-small"
 FINE_TUNED_MODEL = os.path.join(os.path.dirname(__file__), '..', 'models', 'whisper-small-hindi')
 OUTPUT_DIR = os.path.join(os.path.dirname(__file__), '..', 'results')
-RESULTS_CSV = os.path.join(OUTPUT_DIR, 'evaluation_results.csv')
-RESULTS_JSON = os.path.join(OUTPUT_DIR, 'evaluation_results.json')
+RESULTS_CSV = os.path.join(OUTPUT_DIR, 'FT Result.csv')
+RESULTS_JSON = os.path.join(OUTPUT_DIR, 'FT Result.json')
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
