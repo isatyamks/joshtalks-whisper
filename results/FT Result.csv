@@ -1,0 +1,4 @@
+Model,WER (%),CER (%),Num Samples
+Whisper-small (Baseline),84.16,48.88,418
+Whisper-small (Fine-tuned),80.50,49.04,418
+Improvement,+4.35%,-0.34%,-

@@ -17,7 +17,6 @@ models/
 !models/.gitkeep
 
 # Results (excluding .gitkeep)
-results/
 !results/.gitkeep
 
 # Python cache
